@@ -1,0 +1,67 @@
+use anyhow::Result;
+use std::{collections::HashMap, fs::File, io::Read, path::PathBuf};
+
+use pruner::{
+  api::grammar::{self, Grammars},
+  config::{FormatterSpecs, LanguageFormatters},
+};
+
+#[allow(dead_code)]
+pub fn formatters() -> FormatterSpecs {
+  HashMap::from([
+    (
+      "prettier".to_string(),
+      pruner::config::FormatterSpec {
+        cmd: "prettier".into(),
+        args: Vec::from([
+          "--prose-wrap=always".into(),
+          "--print-width=$textwidth".into(),
+          "--parser=$language".into(),
+        ]),
+        stdin: None,
+        fail_on_stderr: None,
+      },
+    ),
+    (
+      "cljfmt".to_string(),
+      pruner::config::FormatterSpec {
+        cmd: "cljfmt".into(),
+        args: Vec::from([
+          "fix".into(),
+          "-".into(),
+          "--remove-multiple-non-indenting-spaces".into(),
+        ]),
+        stdin: Some(true),
+        fail_on_stderr: None,
+      },
+    ),
+  ])
+}
+
+#[allow(dead_code)]
+pub fn grammars() -> Result<Grammars> {
+  grammar::load_grammars(
+    &["tests/fixtures/grammars".into()],
+    &["tests/fixtures/queries".into()],
+    Some("tests/fixtures/.build".into()),
+  )
+}
+
+#[allow(dead_code)]
+pub fn languages() -> LanguageFormatters {
+  HashMap::from([
+    ("markdown".to_string(), vec!["prettier".to_string()]),
+    ("clojure".to_string(), vec!["cljfmt".to_string()]),
+  ])
+}
+
+#[allow(dead_code)]
+pub fn load_file(path: &str) -> String {
+  let filepath = PathBuf::from("tests/fixtures/tests/").join(path);
+  let mut file = File::open(filepath).expect("File should exist");
+  let mut contents = String::new();
+  file
+    .read_to_string(&mut contents)
+    .expect("Should be able to read source file");
+  contents
+}

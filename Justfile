@@ -1,0 +1,22 @@
+default:
+    @just --list
+
+prepare:
+    #!/bin/sh
+    set -eo pipefail
+
+    rm -rf tests/fixtures/grammars || true
+    mkdir -p tests/fixtures/grammars
+
+    git clone https://github.com/tree-sitter-grammars/tree-sitter-markdown --depth 1 tests/fixtures/grammars/markdown
+    git clone https://github.com/sogaiu/tree-sitter-clojure --depth 1 tests/fixtures/grammars/clojure
+    git clone https://github.com/derekstride/tree-sitter-sql --depth 1 --branch gh-pages tests/fixtures/grammars/sql
+
+build:
+    cargo build --release
+
+install: build
+    cp target/release/pruner ~/.local/bin/pruner
+
+test test = "":
+    cargo test {{ test }} -- --nocapture
