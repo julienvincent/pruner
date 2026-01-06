@@ -90,22 +90,85 @@ pub fn sort_escape_chars(escape_chars: &HashSet<String>) -> Vec<String> {
   chars
 }
 
+// Unescape injected text before passing it to a nested formatter.
+//
+// We scan left-to-right and treat `\\` as a literal backslash so double-escaped sequences survive.
+//
+// Only when a backslash directly prefixes one of the configured escape characters do we drop the
+// backslash and emit the raw character.
 pub fn unescape_text(text: &str, escape_chars: &[String]) -> String {
-  let mut result = text.to_string();
-  for escape_char in escape_chars {
-    let mut pattern = String::from("\\");
-    pattern.push_str(escape_char);
-    result = result.replace(&pattern, escape_char);
+  let mut result = String::with_capacity(text.len());
+  let escape_bytes: Vec<&[u8]> = escape_chars.iter().map(|s| s.as_bytes()).collect();
+
+  let mut index = 0;
+  while index < text.len() {
+    let remaining = &text[index..];
+    if remaining.as_bytes().first() == Some(&b'\\') {
+      if remaining.as_bytes().get(1) == Some(&b'\\') {
+        result.push('\\');
+        index += 2;
+        continue;
+      }
+      let mut matched = false;
+      for escape in &escape_bytes {
+        if remaining
+          .as_bytes()
+          .get(1..)
+          .is_some_and(|rest| rest.starts_with(escape))
+        {
+          result.push_str(std::str::from_utf8(escape).unwrap());
+          index += 1 + escape.len();
+          matched = true;
+          break;
+        }
+      }
+      if matched {
+        continue;
+      }
+    }
+
+    let ch = remaining.chars().next().unwrap();
+    result.push(ch);
+    index += ch.len_utf8();
   }
+
   result
 }
 
+// Re-escape injected text before reinserting it into the outer document.
+//
+// We scan left-to-right and always escape literal backslashes, then prefix any configured escape
+// character with a backslash.
 pub fn escape_text(text: &str, escape_chars: &[String]) -> String {
-  let mut result = text.to_string();
-  for escape_char in escape_chars {
-    let mut replacement = String::from("\\");
-    replacement.push_str(escape_char);
-    result = result.replace(escape_char, &replacement);
+  let mut result = String::with_capacity(text.len());
+  let escape_bytes: Vec<&[u8]> = escape_chars.iter().map(|s| s.as_bytes()).collect();
+
+  let mut index = 0;
+  while index < text.len() {
+    let remaining = &text[index..];
+    if remaining.as_bytes().first() == Some(&b'\\') {
+      result.push_str("\\\\");
+      index += 1;
+      continue;
+    }
+    let mut matched = false;
+    for escape in &escape_bytes {
+      if remaining.as_bytes().starts_with(escape) {
+        result.push('\\');
+        result.push_str(std::str::from_utf8(escape).unwrap());
+        index += escape.len();
+        matched = true;
+        break;
+      }
+    }
+    if matched {
+      continue;
+    }
+
+    let ch = remaining.chars().next().unwrap();
+    result.push(ch);
+    index += ch.len_utf8();
   }
+
   result
 }

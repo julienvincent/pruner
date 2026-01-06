@@ -78,6 +78,96 @@ fn fail_on_empty_stdout() -> Result<()> {
 }
 
 #[test]
+fn format_escaped() -> Result<()> {
+  let grammars = common::grammars()?;
+  let formatters = common::formatters();
+  let languages = common::languages();
+
+  let source = common::load_file("format_escaped/input.clj");
+
+  let result = format::format(
+    source.as_bytes(),
+    &FormatOpts {
+      printwidth: 80,
+      language: "clojure",
+    },
+    false,
+    &FormatContext {
+      grammars: &grammars,
+      languages: &languages,
+      formatters: &formatters,
+    },
+  )
+  .unwrap();
+
+  let expected = common::load_file("format_escaped/output.clj");
+
+  assert_eq!(String::from_utf8(result).unwrap(), expected);
+
+  Ok(())
+}
+
+#[test]
+fn markdown_with_escape_characters() -> Result<()> {
+  let grammars = common::grammars()?;
+  let formatters = common::formatters();
+  let languages = common::languages();
+
+  let source = common::load_file("markdown_with_escape_characters/input.md");
+
+  let result = format::format(
+    source.as_bytes(),
+    &FormatOpts {
+      printwidth: 80,
+      language: "markdown",
+    },
+    false,
+    &FormatContext {
+      grammars: &grammars,
+      languages: &languages,
+      formatters: &formatters,
+    },
+  )
+  .unwrap();
+
+  let expected = common::load_file("markdown_with_escape_characters/output.md");
+
+  assert_eq!(String::from_utf8(result).unwrap(), expected);
+
+  Ok(())
+}
+
+#[test]
+fn format_double_escaped() -> Result<()> {
+  let grammars = common::grammars()?;
+  let formatters = common::formatters();
+  let languages = common::languages();
+
+  let source = common::load_file("double_escaped/input.clj");
+
+  let result = format::format(
+    source.as_bytes(),
+    &FormatOpts {
+      printwidth: 80,
+      language: "clojure",
+    },
+    false,
+    &FormatContext {
+      grammars: &grammars,
+      languages: &languages,
+      formatters: &formatters,
+    },
+  )
+  .unwrap();
+
+  let expected = common::load_file("double_escaped/output.clj");
+
+  assert_eq!(String::from_utf8(result).unwrap(), expected);
+
+  Ok(())
+}
+
+#[test]
 fn format_injections_only() -> Result<()> {
   let grammars = common::grammars()?;
   let formatters = common::formatters();
