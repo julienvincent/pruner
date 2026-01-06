@@ -110,5 +110,17 @@ pub fn format(formatter: &FormatterSpec, source: &[u8], opts: &FormatOpts) -> Re
     }
   }
 
-  result
+  match result {
+    Ok(result) => {
+      if result.is_empty() {
+        Err(anyhow::format_err!(
+          "Unexpected empty result received from formatter: {}",
+          formatter.cmd
+        ))
+      } else {
+        Ok(result)
+      }
+    }
+    Err(err) => Err(err),
+  }
 }

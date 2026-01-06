@@ -35,6 +35,49 @@ fn format_command() -> Result<()> {
 }
 
 #[test]
+fn fail_on_empty_stdout() -> Result<()> {
+  let grammars = common::grammars()?;
+  let mut formatters = common::formatters();
+  let languages = common::languages();
+
+  formatters.insert(
+    "prettier".into(),
+    pruner::config::FormatterSpec {
+      cmd: "echo".into(),
+      args: vec!["-n".into()],
+      stdin: None,
+      fail_on_stderr: None,
+    },
+  );
+
+  let source = common::load_file("format_command/input.clj");
+
+  let result = format::format(
+    source.as_bytes(),
+    &FormatOpts {
+      printwidth: 80,
+      language: "clojure",
+    },
+    false,
+    &FormatContext {
+      grammars: &grammars,
+      languages: &languages,
+      formatters: &formatters,
+    },
+  );
+
+  match result {
+    Ok(_) => panic!("the formatter should cause a failure"),
+    Err(err) => assert_eq!(
+      "Unexpected empty result received from formatter: echo",
+      err.to_string()
+    ),
+  };
+
+  Ok(())
+}
+
+#[test]
 fn format_injections_only() -> Result<()> {
   let grammars = common::grammars()?;
   let formatters = common::formatters();
