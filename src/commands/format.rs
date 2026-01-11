@@ -1,11 +1,5 @@
 use anyhow::{Context, Result};
-use std::{
-  fs,
-  io::Read,
-  path::{Path, PathBuf},
-  process::exit,
-  time::Instant,
-};
+use std::{fs, io::Read, path::PathBuf, process::exit, time::Instant};
 
 use crate::{
   api::{
@@ -13,7 +7,7 @@ use crate::{
     format::{self, FormatContext, FormatOpts},
   },
   cli::GlobalOpts,
-  config::PrunerConfig,
+  config,
 };
 
 #[derive(clap::Args, Debug)]
@@ -76,14 +70,6 @@ pub struct FormatArgs {
   include_glob: Option<String>,
 }
 
-fn paths_relative_to(root: &Path, paths: &[PathBuf]) -> Vec<PathBuf> {
-  paths
-    .iter()
-    .cloned()
-    .map(|entry| root.join(entry))
-    .collect::<Vec<_>>()
-}
-
 fn format_stdin(args: &FormatArgs, context: &FormatContext) -> Result<()> {
   let input = {
     let mut buf = Vec::new();
@@ -140,15 +126,10 @@ fn format_files(args: &FormatArgs, context: &FormatContext) -> Result<()> {
 }
 
 pub fn handle(args: FormatArgs, global: GlobalOpts) -> Result<()> {
-  let xdg_dirs = xdg::BaseDirectories::with_prefix("pruner");
-  let config_path = global.config.or(xdg_dirs.find_config_file("config.toml"));
-  let pruner_config = match config_path.as_deref() {
-    Some(config_path) => PrunerConfig::from_file(config_path)
-      .with_context(|| format!("Failed to load config {:?}", config_path))?,
-    None => PrunerConfig::default(),
-  };
-
   let cwd = std::env::current_dir()?;
+  let xdg_dirs = xdg::BaseDirectories::with_prefix("pruner");
+  let pruner_config = config::load(global.config)?;
+
   let repos_dir = cwd.join(
     pruner_config
       .grammar_download_dir
@@ -174,19 +155,10 @@ pub fn handle(args: FormatArgs, global: GlobalOpts) -> Result<()> {
     Instant::now().duration_since(start)
   );
 
-  let config_relative_path = config_path
-    .and_then(|path| path.parent().map(PathBuf::from))
-    .unwrap_or(cwd.clone());
-  let mut grammar_paths = paths_relative_to(
-    &config_relative_path,
-    &pruner_config.grammar_paths.unwrap_or_default(),
-  );
+  let mut grammar_paths = pruner_config.grammar_paths.clone().unwrap_or_default();
   grammar_paths.push(repos_dir);
 
-  let query_paths = paths_relative_to(
-    &config_relative_path,
-    &pruner_config.query_paths.unwrap_or_default(),
-  );
+  let query_paths = pruner_config.query_paths.clone().unwrap_or_default();
 
   let start = Instant::now();
   let grammars = api::grammar::load_grammars(&grammar_paths, &query_paths, Some(lib_dir))
