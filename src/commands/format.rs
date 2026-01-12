@@ -8,6 +8,7 @@ use crate::{
   },
   cli::GlobalOpts,
   config,
+  wasm::formatter::WasmFormatter,
 };
 
 #[derive(clap::Args, Debug)]
@@ -130,6 +131,9 @@ pub fn handle(args: FormatArgs, global: GlobalOpts) -> Result<()> {
   let xdg_dirs = xdg::BaseDirectories::with_prefix("pruner");
   let pruner_config = config::load(global.config)?;
 
+  let wasm_formatter =
+    WasmFormatter::from_config(&pruner_config, xdg_dirs.place_data_file("cache")?)?;
+
   let repos_dir = cwd.join(
     pruner_config
       .grammar_download_dir
@@ -172,6 +176,7 @@ pub fn handle(args: FormatArgs, global: GlobalOpts) -> Result<()> {
     grammars: &grammars,
     languages: &pruner_config.languages.unwrap_or_default(),
     formatters: &pruner_config.formatters.unwrap_or_default(),
+    wasm_formatter: &wasm_formatter,
   };
 
   if args.include_glob.is_some() {

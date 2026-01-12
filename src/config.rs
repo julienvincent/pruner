@@ -40,7 +40,24 @@ pub struct FormatterSpec {
   pub fail_on_stderr: Option<bool>,
 }
 
+#[derive(serde::Deserialize, Debug, Clone)]
+#[serde(untagged)]
+pub enum WasmComponentSpec {
+  Url(Url),
+  Table { url: Url },
+}
+
+impl WasmComponentSpec {
+  pub fn url(&self) -> &Url {
+    match self {
+      Self::Url(url) => url,
+      Self::Table { url, .. } => url,
+    }
+  }
+}
+
 pub type FormatterSpecs = HashMap<String, FormatterSpec>;
+pub type WasmComponentSpecs = HashMap<String, WasmComponentSpec>;
 pub type GrammarSpecs = HashMap<String, GrammarSpec>;
 
 pub type LanguageFormatSpec = Vec<String>;
@@ -57,6 +74,7 @@ pub struct PrunerConfig {
   pub grammars: Option<GrammarSpecs>,
   pub languages: Option<LanguageFormatters>,
   pub formatters: Option<FormatterSpecs>,
+  pub wasm_formatters: Option<WasmComponentSpecs>,
 }
 
 fn absolutize_vec(paths: Vec<PathBuf>, base_dir: &Path) -> Vec<PathBuf> {
@@ -123,6 +141,7 @@ impl PrunerConfig {
       grammars: merge_maps(&base.grammars, &overlay.grammars),
       languages: merge_maps(&base.languages, &overlay.languages),
       formatters: merge_maps(&base.formatters, &overlay.formatters),
+      wasm_formatters: merge_maps(&base.wasm_formatters, &overlay.wasm_formatters),
     }
   }
 

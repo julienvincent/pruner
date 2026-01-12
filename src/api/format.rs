@@ -6,6 +6,7 @@ use tree_sitter::Parser;
 use crate::{
   api::{self, grammar::Grammars, text},
   config::{FormatterSpecs, LanguageFormatters},
+  wasm::formatter::WasmFormatter,
 };
 
 mod runner;
@@ -15,6 +16,7 @@ pub struct FormatContext<'a> {
   pub grammars: &'a Grammars,
   pub languages: &'a LanguageFormatters,
   pub formatters: &'a FormatterSpecs,
+  pub wasm_formatter: &'a WasmFormatter,
 }
 
 pub fn format(
@@ -32,11 +34,19 @@ pub fn format(
   let mut formatted_result = Vec::from(source);
 
   if !skip_root {
-    if let Some(language_formatter_specs) = format_context.languages.get(opts.language) {
-      if let Some(formatter_name) = language_formatter_specs.first() {
-        if let Some(formatter) = format_context.formatters.get(formatter_name) {
-          formatted_result = runner::format(formatter, &formatted_result, opts)?;
-        }
+    for formatter_name in format_context
+      .languages
+      .get(opts.language)
+      .unwrap_or(&Vec::new())
+    {
+      formatted_result = if let Some(formatter) = format_context.formatters.get(formatter_name) {
+        runner::format(formatter, &formatted_result, opts)?
+      } else if format_context.wasm_formatter.has_formatter(formatter_name) {
+        format_context
+          .wasm_formatter
+          .format(formatter_name, &formatted_result, opts)?
+      } else {
+        formatted_result
       }
     }
   }

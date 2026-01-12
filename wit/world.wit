@@ -1,0 +1,18 @@
+package pruner:pruner@1.0.0;
+
+interface formatter {
+  variant format-error {
+    error(string),
+  }
+
+  record format-opts {
+    print-width: u32,
+    lang: string,
+  }
+
+  format: func(source: list<u8>, opts: format-opts) -> result<list<u8>, format-error>;
+}
+
+world pruner {
+  export formatter;
+}

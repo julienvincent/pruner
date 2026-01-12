@@ -6,7 +6,10 @@ use std::{
   time::{SystemTime, UNIX_EPOCH},
 };
 
-use pruner::api::format::{self, FormatContext, FormatOpts};
+use pruner::{
+  api::format::{self, FormatContext, FormatOpts},
+  wasm::formatter::WasmFormatter,
+};
 
 mod common;
 
@@ -15,6 +18,7 @@ fn format_files() -> Result<()> {
   let grammars = common::grammars()?;
   let formatters = common::formatters();
   let languages = common::languages();
+  let wasm_formatter = WasmFormatter::new("cache".into())?;
 
   let input_dir = PathBuf::from("tests/fixtures/tests/format_files/input");
   let output_dir = PathBuf::from("tests/fixtures/tests/format_files/output");
@@ -36,6 +40,7 @@ fn format_files() -> Result<()> {
       grammars: &grammars,
       languages: &languages,
       formatters: &formatters,
+      wasm_formatter: &wasm_formatter,
     },
   )?;
 

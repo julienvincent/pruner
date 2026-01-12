@@ -5,6 +5,7 @@ mod api;
 mod cli;
 mod commands;
 mod config;
+pub mod wasm;
 
 fn main() -> Result<()> {
   let cli = cli::Cli::parse();
@@ -13,7 +14,12 @@ fn main() -> Result<()> {
   log_builder
     .format_timestamp(None)
     .format_target(false)
-    .filter_level(cli.global_opts.log_level.unwrap_or(log::LevelFilter::Info));
+    .filter_module(
+      "pruner",
+      cli.global_opts.log_level.unwrap_or(log::LevelFilter::Info),
+    )
+    .filter_level(log::LevelFilter::Off);
+
   log_builder.init();
 
   match cli.command {
