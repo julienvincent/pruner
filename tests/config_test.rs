@@ -90,7 +90,7 @@ fn merges_configs_with_overlay_priority() {
         },
       ),
     ])),
-    wasm_formatters: None
+    wasm_formatters: None,
   };
 
   let overlay = PrunerConfig {
@@ -123,7 +123,7 @@ fn merges_configs_with_overlay_priority() {
         },
       ),
     ])),
-    wasm_formatters: None
+    wasm_formatters: None,
   };
 
   let merged = PrunerConfig::merge(&base, &overlay);

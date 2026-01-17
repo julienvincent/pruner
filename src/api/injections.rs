@@ -237,8 +237,7 @@ pub fn extract_language_injections(
   let query = &grammar.injections;
 
   let mut cursor = QueryCursor::new();
-  let mut matches =
-    cursor.matches(query, tree.root_node(), source_with_newline.as_ref());
+  let mut matches = cursor.matches(query, tree.root_node(), source_with_newline.as_ref());
 
   let lang_capture_index = query.capture_index_for_name("injection.language");
   let Some(content_capture_index) = query.capture_index_for_name("injection.content") else {

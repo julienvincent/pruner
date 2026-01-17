@@ -1,5 +1,9 @@
 use anyhow::Result;
-use std::{collections::HashMap, path::{Path, PathBuf}, process::Command};
+use std::{
+  collections::HashMap,
+  path::{Path, PathBuf},
+  process::Command,
+};
 use url::Url;
 
 use crate::config::GrammarSpec;

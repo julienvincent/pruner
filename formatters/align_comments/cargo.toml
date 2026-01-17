@@ -1,0 +1,17 @@
+[workspace]
+
+[package]
+name = "align_comments"
+version = "0.1.0"
+edition = "2024"
+resolver = "2"
+
+[dependencies]
+wit-bindgen = "0.50"
+
+tree-sitter = "0.25"
+tree-sitter-clojure = "0.1.0"
+
+
+[lib]
+crate-type = ["cdylib"]
