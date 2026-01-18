@@ -13,7 +13,7 @@ prepare:
     git clone https://github.com/derekstride/tree-sitter-sql --depth 1 --branch gh-pages tests/fixtures/grammars/sql
 
 build:
-    cargo build --release
+    cargo build -p pruner --release
 
 install: build
     cp target/release/pruner ~/.local/bin/pruner

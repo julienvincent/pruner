@@ -1,0 +1,8 @@
+[package]
+name = "pruner-plugin-api"
+version = "0.1.0"
+edition = "2024"
+resolver = "2"
+
+[dependencies]
+wit-bindgen = "0.50"

@@ -1,12 +1,5 @@
+use pruner_plugin_api::{FormatError, FormatOpts, PluginApi};
 use tree_sitter::{Node, Parser, Query, QueryCursor, StreamingIterator};
-
-wit_bindgen::generate!({
-  world: "pruner:pruner/pruner@1.0.0",
-  path: "../../wit",
-  pub_export_macro: true,
-});
-
-use exports::pruner::pruner::formatter::{FormatError, FormatOpts};
 
 struct Component;
 
@@ -139,7 +132,7 @@ fn apply_edits(source: Vec<u8>, mut edits: Vec<Edit>) -> Vec<u8> {
   result
 }
 
-impl exports::pruner::pruner::formatter::Guest for Component {
+impl PluginApi for Component {
   fn format(source: Vec<u8>, _opts: FormatOpts) -> Result<Vec<u8>, FormatError> {
     let mut parser = Parser::new();
     let language = tree_sitter_clojure::LANGUAGE.into();
@@ -207,10 +200,7 @@ impl exports::pruner::pruner::formatter::Guest for Component {
   }
 }
 
-export!(Component);
-
-#[cfg(test)]
-use exports::pruner::pruner::formatter::Guest;
+pruner_plugin_api::bindings::export!(Component);
 
 #[test]
 fn test_align_single_comment() -> Result<(), FormatError> {

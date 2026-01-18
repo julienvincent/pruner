@@ -1,32 +1,15 @@
-[package]
-name = "pruner"
-version = "0.1.0"
-edition = "2024"
+[workspace]
+members = [
+  "crates/cli",
+  "crates/plugin-api",
+  "plugins/align-comments",
+  "plugins/trim-newlines",
+]
+resolver = "2"
 
-[dependencies]
-clap = { version = "4", features = ["derive"] }
-
-tree-sitter = "0.25"
-tree-sitter-loader = "0.25"
-
-wasmtime = "40"
-wasmtime-wasi = "40"
-
-rayon = "1"
-toml = "0.9"
-serde = "1.0"
-url = "2"
-anyhow = "1"
-xdg = "3"
-sha2 = "0.10"
-ureq = "2"
-
-ignore = "0.4"
-globset = "0.4"
-
-log = "0.4"
-env_logger = "0.11"
-
-[dev-dependencies]
-
-fslock = "0.2"
+[profile.release]
+codegen-units = 1
+opt-level = "s"
+debug = false
+strip = true
+lto = true

@@ -1,14 +1,8 @@
-wit_bindgen::generate!({
-  world: "pruner:pruner/pruner@1.0.0",
-  path: "../../wit",
-  pub_export_macro: true,
-});
-
-use exports::pruner::pruner::formatter::{FormatError, FormatOpts};
+use pruner_plugin_api::{FormatError, FormatOpts, PluginApi};
 
 struct Component;
 
-impl exports::pruner::pruner::formatter::Guest for Component {
+impl PluginApi for Component {
   fn format(source: Vec<u8>, _opts: FormatOpts) -> Result<Vec<u8>, FormatError> {
     let mut start = 0;
     let mut end = source.len();
@@ -25,10 +19,7 @@ impl exports::pruner::pruner::formatter::Guest for Component {
   }
 }
 
-export!(Component);
-
-#[cfg(test)]
-use exports::pruner::pruner::formatter::Guest;
+pruner_plugin_api::bindings::export!(Component);
 
 #[test]
 fn format_test() -> Result<(), FormatError> {
