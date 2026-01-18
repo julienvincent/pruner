@@ -24,28 +24,21 @@ fn apply_single_profile() {
     grammar_paths: Some(vec![PathBuf::from("base_grammars")]),
     grammar_download_dir: Some(PathBuf::from("base_downloads")),
     grammar_build_dir: Some(PathBuf::from("base_build")),
-    grammars: None,
     languages: Some(HashMap::from([
       ("markdown".to_string(), vec!["prettier".to_string()]),
       ("rust".to_string(), vec!["rustfmt".to_string()]),
     ])),
-    formatters: None,
-    plugins: None,
-    profiles: None,
+    ..Default::default()
   };
 
   let profile = ProfileConfig {
     query_paths: Some(vec![PathBuf::from("profile_queries")]),
-    grammar_paths: None,
     grammar_download_dir: Some(PathBuf::from("profile_downloads")),
-    grammar_build_dir: None,
-    grammars: None,
     languages: Some(HashMap::from([(
       "markdown".to_string(),
       vec!["profile_prettier".to_string()],
     )])),
-    formatters: None,
-    plugins: None,
+    ..Default::default()
   };
 
   let result = base.apply_profile(&profile);
@@ -82,46 +75,33 @@ fn apply_single_profile() {
 fn apply_multiple_profiles_in_order() {
   let base = ConfigFile {
     query_paths: Some(vec![PathBuf::from("base")]),
-    grammar_paths: None,
     grammar_download_dir: Some(PathBuf::from("base_downloads")),
-    grammar_build_dir: None,
-    grammars: None,
     languages: Some(HashMap::from([
       ("markdown".to_string(), vec!["base_md".to_string()]),
       ("rust".to_string(), vec!["base_rust".to_string()]),
       ("python".to_string(), vec!["base_python".to_string()]),
     ])),
-    formatters: None,
-    plugins: None,
-    profiles: None,
+    ..Default::default()
   };
 
   let profile_a = ProfileConfig {
     query_paths: Some(vec![PathBuf::from("profile_a")]),
-    grammar_paths: None,
     grammar_download_dir: Some(PathBuf::from("profile_a_downloads")),
-    grammar_build_dir: None,
-    grammars: None,
     languages: Some(HashMap::from([
       ("markdown".to_string(), vec!["profile_a_md".to_string()]),
       ("rust".to_string(), vec!["profile_a_rust".to_string()]),
     ])),
-    formatters: None,
-    plugins: None,
+    ..Default::default()
   };
 
   let profile_b = ProfileConfig {
     query_paths: Some(vec![PathBuf::from("profile_b")]),
-    grammar_paths: None,
-    grammar_download_dir: None,
     grammar_build_dir: Some(PathBuf::from("profile_b_build")),
-    grammars: None,
     languages: Some(HashMap::from([(
       "markdown".to_string(),
       vec!["profile_b_md".to_string()],
     )])),
-    formatters: None,
-    plugins: None,
+    ..Default::default()
   };
 
   let result = base.apply_profile(&profile_a).apply_profile(&profile_b);
@@ -168,14 +148,11 @@ fn profile_with_empty_fields_does_not_override() {
     grammar_paths: Some(vec![PathBuf::from("base_grammars")]),
     grammar_download_dir: Some(PathBuf::from("base_downloads")),
     grammar_build_dir: Some(PathBuf::from("base_build")),
-    grammars: None,
     languages: Some(HashMap::from([(
       "markdown".to_string(),
       vec!["prettier".to_string()],
     )])),
-    formatters: None,
-    plugins: None,
-    profiles: None,
+    ..Default::default()
   };
 
   let empty_profile = ProfileConfig::default();

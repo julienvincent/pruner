@@ -65,7 +65,6 @@ fn merges_configs_with_overlay_priority() {
     grammar_paths: Some(vec![PathBuf::from("base_grammar")]),
     grammar_download_dir: Some(PathBuf::from("base_downloads")),
     grammar_build_dir: Some(PathBuf::from("base_build")),
-    grammars: None,
     languages: Some(HashMap::from([
       ("markdown".to_string(), vec!["base_fmt".to_string()]),
       ("clojure".to_string(), vec!["base_clj".to_string()]),
@@ -90,16 +89,13 @@ fn merges_configs_with_overlay_priority() {
         },
       ),
     ])),
-    plugins: None,
-    profiles: None,
+    ..Default::default()
   };
 
   let overlay = ConfigFile {
     query_paths: Some(vec![PathBuf::from("overlay_query")]),
     grammar_paths: Some(vec![PathBuf::from("overlay_grammar")]),
     grammar_download_dir: Some(PathBuf::from("overlay_downloads")),
-    grammar_build_dir: None,
-    grammars: None,
     languages: Some(HashMap::from([
       ("markdown".to_string(), vec!["overlay_fmt".to_string()]),
       ("rust".to_string(), vec!["rust_fmt".to_string()]),
@@ -124,8 +120,7 @@ fn merges_configs_with_overlay_priority() {
         },
       ),
     ])),
-    plugins: None,
-    profiles: None,
+    ..Default::default()
   };
 
   let merged = ConfigFile::merge(&base, &overlay);
@@ -202,7 +197,6 @@ fn applies_profile_overrides() {
     grammar_paths: Some(vec![PathBuf::from("base_grammar")]),
     grammar_download_dir: Some(PathBuf::from("base_downloads")),
     grammar_build_dir: Some(PathBuf::from("base_build")),
-    grammars: None,
     languages: Some(HashMap::from([(
       "markdown".to_string(),
       vec!["base_fmt".to_string()],
@@ -216,22 +210,17 @@ fn applies_profile_overrides() {
         fail_on_stderr: None,
       },
     )])),
-    plugins: None,
-    profiles: None,
+    ..Default::default()
   };
 
   let profile = ProfileConfig {
     query_paths: Some(vec![PathBuf::from("profile_query")]),
-    grammar_paths: None,
     grammar_download_dir: Some(PathBuf::from("profile_downloads")),
-    grammar_build_dir: None,
-    grammars: None,
     languages: Some(HashMap::from([
       ("markdown".to_string(), vec!["profile_fmt".to_string()]),
       ("rust".to_string(), vec!["rust_fmt".to_string()]),
     ])),
-    formatters: None,
-    plugins: None,
+    ..Default::default()
   };
 
   let result = base.apply_profile(&profile);
