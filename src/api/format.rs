@@ -27,10 +27,6 @@ pub fn format(
 ) -> Result<Vec<u8>> {
   let mut parser = Parser::new();
 
-  let Some(grammar) = format_context.grammars.get(opts.language) else {
-    return Ok(Vec::from(source));
-  };
-
   let mut formatted_result = Vec::from(source);
 
   if !skip_root {
@@ -50,6 +46,10 @@ pub fn format(
       }
     }
   }
+
+  let Some(grammar) = format_context.grammars.get(opts.language) else {
+    return Ok(formatted_result);
+  };
 
   let mut injected_regions =
     api::injections::extract_language_injections(&mut parser, grammar, &formatted_result)?;
