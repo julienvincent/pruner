@@ -67,6 +67,10 @@ jobs:
 
           mv checksums.txt bin/checksums.txt
 
+      - name: Copy WIT
+        run: |
+          cp wit/world.wit bin/plugin-api.wit
+
       - name: Release
         uses: softprops/action-gh-release@v2
         if: startsWith(github.ref, 'refs/tags/')
