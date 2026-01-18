@@ -3,11 +3,11 @@ use std::{path::PathBuf, time::Instant};
 use wasmtime::{Engine, component::Linker};
 use wasmtime_wasi::{ResourceTable, WasiCtx, WasiCtxView, WasiView};
 
-use crate::{api::format::FormatOpts, config::Config};
-
-use super::{
-  bindings::{Pruner, exports::pruner::pruner::formatter},
-  registry,
+use super::registry;
+use crate::{
+  api::format::FormatOpts,
+  config::Config,
+  wasm::bindings::{Plugin, exports::pruner::plugin_api},
 };
 
 struct ComponentState {
@@ -75,19 +75,19 @@ impl WasmFormatter {
     let Some(component) = self.registry.get_component(name) else {
       anyhow::bail!("Unknown formatter {name}");
     };
-    let formatter = Pruner::instantiate(&mut store, component, &self.linker)?;
+    let plugin = Plugin::instantiate(&mut store, component, &self.linker)?;
 
     log::debug!(
       "Wasm formatter instantiated in: {:?}",
       Instant::now().duration_since(start)
     );
 
-    formatter
-      .pruner_pruner_formatter()
+    plugin
+      .pruner_plugin_api_formatter()
       .call_format(
         &mut store,
         source,
-        &formatter::FormatOpts {
+        &plugin_api::formatter::FormatOpts {
           print_width: opts.printwidth,
           lang: opts.language.into(),
         },

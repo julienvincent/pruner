@@ -1,4 +1,4 @@
 wasmtime::component::bindgen!({
-    world: "pruner",
+    world: "plugin",
     path: "../../wit",
 });

@@ -1,4 +1,4 @@
-package pruner:pruner@1.0.0;
+package pruner:plugin-api@1.0.0;
 
 interface formatter {
   variant format-error {
@@ -13,6 +13,6 @@ interface formatter {
   format: func(source: list<u8>, opts: format-opts) -> result<list<u8>, format-error>;
 }
 
-world pruner {
+world plugin {
   export formatter;
 }
