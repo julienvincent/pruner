@@ -150,7 +150,7 @@ impl ComponentRegistry {
     self.components.insert(name.into(), component);
 
     log::debug!(
-      "Component loaded in: {:?}",
+      "Component [{name}] loaded in: {:?}",
       Instant::now().duration_since(start)
     );
 

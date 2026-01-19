@@ -54,8 +54,8 @@ pub fn grammars() -> Result<Grammars> {
 #[allow(dead_code)]
 pub fn languages() -> LanguageFormatters {
   HashMap::from([
-    ("markdown".to_string(), vec!["prettier".to_string()]),
-    ("clojure".to_string(), vec!["cljfmt".to_string()]),
+    ("markdown".to_string(), vec!["prettier".into()]),
+    ("clojure".to_string(), vec!["cljfmt".into()]),
   ])
 }
 

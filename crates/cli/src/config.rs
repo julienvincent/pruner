@@ -60,8 +60,60 @@ pub type FormatterSpecs = HashMap<String, FormatterSpec>;
 pub type PluginSpecs = HashMap<String, PluginSpec>;
 pub type GrammarSpecs = HashMap<String, GrammarSpec>;
 
-pub type LanguageFormatSpec = Vec<String>;
-pub type LanguageFormatters = HashMap<String, LanguageFormatSpec>;
+fn default_resource() -> bool {
+  true
+}
+
+#[derive(serde::Deserialize, Debug, Clone, PartialEq)]
+#[serde(untagged)]
+pub enum LanguageFormatSpec {
+  String(String),
+  Table {
+    formatter: String,
+
+    #[serde(default = "default_resource")]
+    run_in_root: bool,
+    #[serde(default = "default_resource")]
+    run_in_injections: bool,
+  },
+}
+impl LanguageFormatSpec {
+  pub fn formatter(&self) -> &str {
+    match self {
+      Self::String(formatter) => formatter,
+      Self::Table { formatter, .. } => formatter,
+    }
+  }
+  pub fn run_in_root(&self) -> bool {
+    match self {
+      Self::String(_) => true,
+      Self::Table { run_in_root, .. } => *run_in_root,
+    }
+  }
+  pub fn run_in_injections(&self) -> bool {
+    match self {
+      Self::String(_) => true,
+      Self::Table {
+        run_in_injections, ..
+      } => *run_in_injections,
+    }
+  }
+}
+
+impl From<String> for LanguageFormatSpec {
+  fn from(value: String) -> Self {
+    LanguageFormatSpec::String(value)
+  }
+}
+
+impl From<&str> for LanguageFormatSpec {
+  fn from(value: &str) -> Self {
+    LanguageFormatSpec::String(value.into())
+  }
+}
+
+pub type LanguageFormatSpecs = Vec<LanguageFormatSpec>;
+pub type LanguageFormatters = HashMap<String, LanguageFormatSpecs>;
 
 /// Profile-specific configuration overrides.
 /// Has the same fields as ConfigFile (except profiles) to allow full override capability.

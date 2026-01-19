@@ -22,7 +22,8 @@ fn format_command() -> Result<()> {
       printwidth: 80,
       language: "clojure",
     },
-    false,
+    true,
+    true,
     &FormatContext {
       grammars: &grammars,
       languages: &languages,
@@ -64,7 +65,8 @@ fn fail_on_empty_stdout() -> Result<()> {
       printwidth: 80,
       language: "clojure",
     },
-    false,
+    true,
+    true,
     &FormatContext {
       grammars: &grammars,
       languages: &languages,
@@ -99,7 +101,8 @@ fn format_escaped() -> Result<()> {
       printwidth: 80,
       language: "clojure",
     },
-    false,
+    true,
+    true,
     &FormatContext {
       grammars: &grammars,
       languages: &languages,
@@ -131,7 +134,8 @@ fn markdown_with_escape_characters() -> Result<()> {
       printwidth: 80,
       language: "markdown",
     },
-    false,
+    true,
+    true,
     &FormatContext {
       grammars: &grammars,
       languages: &languages,
@@ -163,7 +167,8 @@ fn format_double_escaped() -> Result<()> {
       printwidth: 80,
       language: "clojure",
     },
-    false,
+    true,
+    true,
     &FormatContext {
       grammars: &grammars,
       languages: &languages,
@@ -195,6 +200,7 @@ fn format_injections_only() -> Result<()> {
       printwidth: 80,
       language: "clojure",
     },
+    false,
     true,
     &FormatContext {
       grammars: &grammars,
@@ -227,6 +233,7 @@ fn offset_dependent_printwidth() -> Result<()> {
       printwidth: 80,
       language: "clojure",
     },
+    false,
     true,
     &FormatContext {
       grammars: &grammars,
@@ -259,7 +266,8 @@ fn format_fixes_indent() -> Result<()> {
       printwidth: 80,
       language: "clojure",
     },
-    false,
+    true,
+    true,
     &FormatContext {
       grammars: &grammars,
       languages: &languages,
@@ -291,7 +299,8 @@ fn markdown_with_html() -> Result<()> {
       printwidth: 80,
       language: "markdown",
     },
-    false,
+    true,
+    true,
     &FormatContext {
       grammars: &grammars,
       languages: &languages,

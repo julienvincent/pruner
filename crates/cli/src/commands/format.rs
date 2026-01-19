@@ -85,7 +85,8 @@ fn format_stdin(args: &FormatArgs, context: &FormatContext) -> Result<()> {
       printwidth: args.print_width,
       language: &args.lang,
     },
-    args.skip_root,
+    !args.skip_root,
+    true,
     context,
   )?;
   log::debug!(

@@ -25,8 +25,8 @@ fn apply_single_profile() {
     grammar_download_dir: Some(PathBuf::from("base_downloads")),
     grammar_build_dir: Some(PathBuf::from("base_build")),
     languages: Some(HashMap::from([
-      ("markdown".to_string(), vec!["prettier".to_string()]),
-      ("rust".to_string(), vec!["rustfmt".to_string()]),
+      ("markdown".to_string(), vec!["prettier".into()]),
+      ("rust".to_string(), vec!["rustfmt".into()]),
     ])),
     ..Default::default()
   };
@@ -36,7 +36,7 @@ fn apply_single_profile() {
     grammar_download_dir: Some(PathBuf::from("profile_downloads")),
     languages: Some(HashMap::from([(
       "markdown".to_string(),
-      vec!["profile_prettier".to_string()],
+      vec!["profile_prettier".into()],
     )])),
     ..Default::default()
   };
@@ -66,9 +66,9 @@ fn apply_single_profile() {
   let languages = result.languages.unwrap();
   assert_eq!(
     languages.get("markdown").unwrap(),
-    &vec!["profile_prettier".to_string()]
+    &vec!["profile_prettier".into()]
   );
-  assert_eq!(languages.get("rust").unwrap(), &vec!["rustfmt".to_string()]);
+  assert_eq!(languages.get("rust").unwrap(), &vec!["rustfmt".into()]);
 }
 
 #[test]
@@ -77,9 +77,9 @@ fn apply_multiple_profiles_in_order() {
     query_paths: Some(vec![PathBuf::from("base")]),
     grammar_download_dir: Some(PathBuf::from("base_downloads")),
     languages: Some(HashMap::from([
-      ("markdown".to_string(), vec!["base_md".to_string()]),
-      ("rust".to_string(), vec!["base_rust".to_string()]),
-      ("python".to_string(), vec!["base_python".to_string()]),
+      ("markdown".to_string(), vec!["base_md".into()]),
+      ("rust".to_string(), vec!["base_rust".into()]),
+      ("python".to_string(), vec!["base_python".into()]),
     ])),
     ..Default::default()
   };
@@ -88,8 +88,8 @@ fn apply_multiple_profiles_in_order() {
     query_paths: Some(vec![PathBuf::from("profile_a")]),
     grammar_download_dir: Some(PathBuf::from("profile_a_downloads")),
     languages: Some(HashMap::from([
-      ("markdown".to_string(), vec!["profile_a_md".to_string()]),
-      ("rust".to_string(), vec!["profile_a_rust".to_string()]),
+      ("markdown".to_string(), vec!["profile_a_md".into()]),
+      ("rust".to_string(), vec!["profile_a_rust".into()]),
     ])),
     ..Default::default()
   };
@@ -99,7 +99,7 @@ fn apply_multiple_profiles_in_order() {
     grammar_build_dir: Some(PathBuf::from("profile_b_build")),
     languages: Some(HashMap::from([(
       "markdown".to_string(),
-      vec!["profile_b_md".to_string()],
+      vec!["profile_b_md".into()],
     )])),
     ..Default::default()
   };
@@ -126,17 +126,17 @@ fn apply_multiple_profiles_in_order() {
   let languages = result.languages.unwrap();
   assert_eq!(
     languages.get("markdown").unwrap(),
-    &vec!["profile_b_md".to_string()],
+    &vec!["profile_b_md".into()],
     "profile_b should override profile_a's markdown setting"
   );
   assert_eq!(
     languages.get("rust").unwrap(),
-    &vec!["profile_a_rust".to_string()],
+    &vec!["profile_a_rust".into()],
     "profile_a's rust setting should persist since profile_b doesn't override it"
   );
   assert_eq!(
     languages.get("python").unwrap(),
-    &vec!["base_python".to_string()],
+    &vec!["base_python".into()],
     "base python setting should persist since no profile overrides it"
   );
 }
@@ -150,7 +150,7 @@ fn profile_with_empty_fields_does_not_override() {
     grammar_build_dir: Some(PathBuf::from("base_build")),
     languages: Some(HashMap::from([(
       "markdown".to_string(),
-      vec!["prettier".to_string()],
+      vec!["prettier".into()],
     )])),
     ..Default::default()
   };
@@ -177,7 +177,7 @@ fn profile_with_empty_fields_does_not_override() {
   );
   assert_eq!(
     result.languages.unwrap().get("markdown").unwrap(),
-    &vec!["prettier".to_string()]
+    &vec!["prettier".into()]
   );
 }
 
@@ -220,11 +220,11 @@ markdown = ["ci_prettier"]
 
   assert_eq!(
     config.languages.get("markdown").unwrap(),
-    &vec!["ci_prettier".to_string()]
+    &vec!["ci_prettier".into()]
   );
   assert_eq!(
     config.languages.get("rust").unwrap(),
-    &vec!["rustfmt".to_string()]
+    &vec!["rustfmt".into()]
   );
 }
 
@@ -279,17 +279,17 @@ markdown = ["debug_prettier"]
 
   assert_eq!(
     config.languages.get("markdown").unwrap(),
-    &vec!["debug_prettier".to_string()],
+    &vec!["debug_prettier".into()],
     "debug profile should override ci profile's markdown"
   );
   assert_eq!(
     config.languages.get("rust").unwrap(),
-    &vec!["ci_rustfmt".to_string()],
+    &vec!["ci_rustfmt".into()],
     "ci profile's rust should persist since debug doesn't override it"
   );
   assert_eq!(
     config.languages.get("python").unwrap(),
-    &vec!["black".to_string()],
+    &vec!["black".into()],
     "base python should persist since no profile overrides it"
   );
 }

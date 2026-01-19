@@ -77,12 +77,12 @@ impl WasmFormatter {
     };
     let plugin = Plugin::instantiate(&mut store, component, &self.linker)?;
 
-    log::debug!(
-      "Wasm formatter instantiated in: {:?}",
+    log::trace!(
+      "Component [{name}] instantiated in: {:?}",
       Instant::now().duration_since(start)
     );
 
-    plugin
+    let res = plugin
       .pruner_plugin_api_formatter()
       .call_format(
         &mut store,
@@ -92,6 +92,13 @@ impl WasmFormatter {
           lang: opts.language.into(),
         },
       )?
-      .map_err(anyhow::Error::from)
+      .map_err(anyhow::Error::from);
+
+    log::debug!(
+      "Formatted using [{name}] in {:?}",
+      Instant::now().duration_since(start)
+    );
+
+    res
   }
 }

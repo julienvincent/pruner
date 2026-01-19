@@ -66,8 +66,8 @@ fn merges_configs_with_overlay_priority() {
     grammar_download_dir: Some(PathBuf::from("base_downloads")),
     grammar_build_dir: Some(PathBuf::from("base_build")),
     languages: Some(HashMap::from([
-      ("markdown".to_string(), vec!["base_fmt".to_string()]),
-      ("clojure".to_string(), vec!["base_clj".to_string()]),
+      ("markdown".to_string(), vec!["base_fmt".into()]),
+      ("clojure".to_string(), vec!["base_clj".into()]),
     ])),
     formatters: Some(HashMap::from([
       (
@@ -97,8 +97,8 @@ fn merges_configs_with_overlay_priority() {
     grammar_paths: Some(vec![PathBuf::from("overlay_grammar")]),
     grammar_download_dir: Some(PathBuf::from("overlay_downloads")),
     languages: Some(HashMap::from([
-      ("markdown".to_string(), vec!["overlay_fmt".to_string()]),
-      ("rust".to_string(), vec!["rust_fmt".to_string()]),
+      ("markdown".to_string(), vec!["overlay_fmt".into()]),
+      ("rust".to_string(), vec!["rust_fmt".into()]),
     ])),
     formatters: Some(HashMap::from([
       (
@@ -182,9 +182,9 @@ fn merges_configs_with_overlay_priority() {
   let languages = merged.languages.unwrap();
   assert_eq!(
     HashMap::from([
-      ("clojure".to_string(), vec!["base_clj".to_string()]),
-      ("markdown".to_string(), vec!["overlay_fmt".to_string()]),
-      ("rust".to_string(), vec!["rust_fmt".to_string()]),
+      ("clojure".to_string(), vec!["base_clj".into()]),
+      ("markdown".to_string(), vec!["overlay_fmt".into()]),
+      ("rust".to_string(), vec!["rust_fmt".into()]),
     ]),
     languages
   );
@@ -199,7 +199,7 @@ fn applies_profile_overrides() {
     grammar_build_dir: Some(PathBuf::from("base_build")),
     languages: Some(HashMap::from([(
       "markdown".to_string(),
-      vec!["base_fmt".to_string()],
+      vec!["base_fmt".into()],
     )])),
     formatters: Some(HashMap::from([(
       "fmt".to_string(),
@@ -217,8 +217,8 @@ fn applies_profile_overrides() {
     query_paths: Some(vec![PathBuf::from("profile_query")]),
     grammar_download_dir: Some(PathBuf::from("profile_downloads")),
     languages: Some(HashMap::from([
-      ("markdown".to_string(), vec!["profile_fmt".to_string()]),
-      ("rust".to_string(), vec!["rust_fmt".to_string()]),
+      ("markdown".to_string(), vec!["profile_fmt".into()]),
+      ("rust".to_string(), vec!["rust_fmt".into()]),
     ])),
     ..Default::default()
   };
@@ -245,8 +245,8 @@ fn applies_profile_overrides() {
   let languages = result.languages.unwrap();
   assert_eq!(
     HashMap::from([
-      ("markdown".to_string(), vec!["profile_fmt".to_string()]),
-      ("rust".to_string(), vec!["rust_fmt".to_string()]),
+      ("markdown".to_string(), vec!["profile_fmt".into()]),
+      ("rust".to_string(), vec!["rust_fmt".into()]),
     ]),
     languages
   );
@@ -305,8 +305,8 @@ rust = ["rustfmt"]
   assert_eq!(
     ci_profile.languages,
     Some(HashMap::from([
-      ("markdown".to_string(), vec!["ci_prettier".to_string()]),
-      ("rust".to_string(), vec!["rustfmt".to_string()]),
+      ("markdown".to_string(), vec!["ci_prettier".into()]),
+      ("rust".to_string(), vec!["rustfmt".into()]),
     ]))
   );
 }
