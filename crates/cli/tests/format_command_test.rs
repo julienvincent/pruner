@@ -77,10 +77,17 @@ fn fail_on_empty_stdout() -> Result<()> {
 
   match result {
     Ok(_) => panic!("the formatter should cause a failure"),
-    Err(err) => assert_eq!(
-      "Unexpected empty result received from formatter: echo",
-      err.to_string()
-    ),
+    Err(err) => {
+      assert_eq!(
+        "Failed to run formatter: prettier",
+        err.to_string()
+      );
+
+      assert_eq!(
+        "Unexpected empty result received from command: echo",
+        err.root_cause().to_string()
+      );
+    }
   };
 
   Ok(())

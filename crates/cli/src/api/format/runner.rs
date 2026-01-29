@@ -114,7 +114,7 @@ pub fn format(formatter: &FormatterSpec, source: &[u8], opts: &FormatOpts) -> Re
     Ok(result) => {
       if result.is_empty() {
         Err(anyhow::format_err!(
-          "Unexpected empty result received from formatter: {}",
+          "Unexpected empty result received from command: {}",
           formatter.cmd
         ))
       } else {
