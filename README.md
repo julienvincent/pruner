@@ -30,18 +30,25 @@ In addition to being able to call out to existing language formatters, Pruner ca
 plugins. This allows encapsulating project/organization specific formatting rules, or writing brand new language
 formatters in any language that can compile to WASM.
 
+## Documentation
+
+- **[Home Page](https://pruner-formatter.github.io)**
+- **[Configuration](https://pruner-formatter.github.io/configuration.html)**
+- **[Language Injections](https://pruner-formatter.github.io/language-injections/about.html)**
+- **[Plugins](https://pruner-formatter.github.io/plugins/about.html)**
+
 ## Installation
 
-### Homebrew
+### Linux
+
+You can download the latest binary for your platform via the
+**[Github releases page](https://github.com/pruner-formatter/pruner/releases)**
+
+### MacOS
 
 ```bash
 brew install pruner-formatter/tap/pruner
 ```
-
-### Raw Binaries
-
-You can download the latest binary for your platform via the
-**[Github releases page](https://github.com/pruner-formatter/pruner/releases)**
 
 ## Quick-Start
 
