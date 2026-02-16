@@ -33,6 +33,7 @@ fn injections_only_pipeline_condition_test() -> Result<()> {
     &FormatOpts {
       printwidth: 80,
       language: "clojure",
+      source_file: None,
     },
     true,
     true,
@@ -58,6 +59,7 @@ fn injections_only_pipeline_condition_test() -> Result<()> {
     &FormatOpts {
       printwidth: 80,
       language: "markdown",
+      source_file: None,
     },
     true,
     true,
@@ -105,6 +107,7 @@ fn root_only_pipeline_condition_test() -> Result<()> {
     &FormatOpts {
       printwidth: 80,
       language: "clojure",
+      source_file: None,
     },
     true,
     true,
@@ -130,6 +133,7 @@ fn root_only_pipeline_condition_test() -> Result<()> {
     &FormatOpts {
       printwidth: 80,
       language: "markdown",
+      source_file: None,
     },
     true,
     true,

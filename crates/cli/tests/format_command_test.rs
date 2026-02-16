@@ -22,6 +22,7 @@ fn format_command() -> Result<()> {
     &FormatOpts {
       printwidth: 80,
       language: "clojure",
+      source_file: None,
     },
     true,
     true,
@@ -55,8 +56,7 @@ fn fail_on_empty_stdout() -> Result<()> {
     pruner::config::FormatterSpec {
       cmd: "echo".into(),
       args: vec!["-n".into()],
-      stdin: None,
-      fail_on_stderr: None,
+      ..Default::default()
     },
   );
 
@@ -67,6 +67,7 @@ fn fail_on_empty_stdout() -> Result<()> {
     &FormatOpts {
       printwidth: 80,
       language: "clojure",
+      source_file: None,
     },
     true,
     true,
@@ -109,6 +110,7 @@ fn format_escaped() -> Result<()> {
     &FormatOpts {
       printwidth: 80,
       language: "clojure",
+      source_file: None,
     },
     true,
     true,
@@ -144,6 +146,7 @@ fn markdown_with_escape_characters() -> Result<()> {
     &FormatOpts {
       printwidth: 80,
       language: "markdown",
+      source_file: None,
     },
     true,
     true,
@@ -179,6 +182,7 @@ fn format_double_escaped() -> Result<()> {
     &FormatOpts {
       printwidth: 80,
       language: "clojure",
+      source_file: None,
     },
     true,
     true,
@@ -214,6 +218,7 @@ fn format_injections_only() -> Result<()> {
     &FormatOpts {
       printwidth: 80,
       language: "clojure",
+      source_file: None,
     },
     false,
     true,
@@ -249,6 +254,7 @@ fn offset_dependent_printwidth() -> Result<()> {
     &FormatOpts {
       printwidth: 80,
       language: "clojure",
+      source_file: None,
     },
     false,
     true,
@@ -284,6 +290,7 @@ fn format_fixes_indent() -> Result<()> {
     &FormatOpts {
       printwidth: 80,
       language: "clojure",
+      source_file: None,
     },
     true,
     true,
@@ -319,6 +326,7 @@ fn markdown_with_html() -> Result<()> {
     &FormatOpts {
       printwidth: 80,
       language: "markdown",
+      source_file: None,
     },
     true,
     true,
@@ -354,6 +362,7 @@ fn utf8_docstring() -> Result<()> {
     &FormatOpts {
       printwidth: 80,
       language: "clojure",
+      source_file: None,
     },
     true,
     true,
@@ -389,6 +398,7 @@ fn nix_embeddings_test() -> Result<()> {
     &FormatOpts {
       printwidth: 80,
       language: "nix",
+      source_file: None,
     },
     true,
     true,
@@ -428,6 +438,7 @@ fn nix_embeddings_trim_directive_test() -> Result<()> {
     &FormatOpts {
       printwidth: 80,
       language: "nix",
+      source_file: None,
     },
     true,
     true,
@@ -462,6 +473,7 @@ fn nix_templated_embeddings_test() -> Result<()> {
     &FormatOpts {
       printwidth: 80,
       language: "nix",
+      source_file: None,
     },
     true,
     true,

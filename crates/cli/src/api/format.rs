@@ -101,6 +101,7 @@ pub fn format(
             .get(&region.lang)
             .map(|s| s.as_str())
             .unwrap_or(region.lang.as_str()),
+          source_file: opts.source_file,
         },
         format_root,
         false,
@@ -152,8 +153,18 @@ pub fn format_file(
 ) -> Result<bool> {
   let content = fs::read(file).context("Failed to read temp file after formatting")?;
 
-  let result = format(&content, opts, !skip_root, true, format_context)
-    .context("Failed to format file contents")?;
+  let result = format(
+    &content,
+    &FormatOpts {
+      printwidth: opts.printwidth,
+      language: opts.language,
+      source_file: Some(file),
+    },
+    !skip_root,
+    true,
+    format_context,
+  )
+  .context("Failed to format file contents")?;
 
   if result == content {
     return Ok(false);

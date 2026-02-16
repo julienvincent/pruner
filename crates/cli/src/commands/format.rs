@@ -69,6 +69,13 @@ pub struct FormatArgs {
   /// If this is _not_ set then pruner will expect source code to be provided via stdin and the
   /// formatted result will be outputted over stdout.
   include_glob: Option<String>,
+
+  /// File path to associate with stdin content when formatting from stdin.
+  ///
+  /// This influences temp-file naming and `colocate_temp_file` behavior for formatters
+  /// configured with `stdin = false`.
+  #[arg(long)]
+  stdin_filepath: Option<PathBuf>,
 }
 
 fn format_stdin(args: &FormatArgs, context: &FormatContext) -> Result<()> {
@@ -84,6 +91,7 @@ fn format_stdin(args: &FormatArgs, context: &FormatContext) -> Result<()> {
     &FormatOpts {
       printwidth: args.print_width,
       language: &args.lang,
+      source_file: args.stdin_filepath.as_deref(),
     },
     !args.skip_root,
     true,
@@ -110,6 +118,7 @@ fn format_files(args: &FormatArgs, context: &FormatContext) -> Result<()> {
     &FormatOpts {
       printwidth: args.print_width,
       language: &args.lang,
+      source_file: None,
     },
     args.skip_root,
     context,

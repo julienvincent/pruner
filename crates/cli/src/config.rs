@@ -32,11 +32,14 @@ impl GrammarSpec {
   }
 }
 
-#[derive(serde::Deserialize, Debug, Clone, PartialEq)]
+#[derive(Default, serde::Deserialize, Debug, Clone, PartialEq)]
 pub struct FormatterSpec {
   pub cmd: String,
   pub args: Vec<String>,
   pub stdin: Option<bool>,
+  pub stdout: Option<bool>,
+  pub file_ext: Option<String>,
+  pub colocate_temp_file: Option<bool>,
   pub fail_on_stderr: Option<bool>,
 }
 

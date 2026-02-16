@@ -35,6 +35,7 @@ fn format_files() -> Result<()> {
     &FormatOpts {
       printwidth: 80,
       language: "clojure",
+      source_file: None,
     },
     false,
     &FormatContext {

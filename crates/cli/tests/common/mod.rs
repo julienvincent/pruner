@@ -19,8 +19,7 @@ pub fn formatters() -> FormatterSpecs {
           "--print-width=$textwidth".into(),
           "--parser=$language".into(),
         ]),
-        stdin: None,
-        fail_on_stderr: None,
+        ..Default::default()
       },
     ),
     (
@@ -33,7 +32,7 @@ pub fn formatters() -> FormatterSpecs {
           "--remove-multiple-non-indenting-spaces".into(),
         ]),
         stdin: Some(true),
-        fail_on_stderr: None,
+        ..Default::default()
       },
     ),
   ])

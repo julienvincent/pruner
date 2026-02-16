@@ -74,18 +74,14 @@ fn merges_configs_with_overlay_priority() {
         "a".to_string(),
         pruner::config::FormatterSpec {
           cmd: "a".to_string(),
-          args: Vec::new(),
-          stdin: None,
-          fail_on_stderr: None,
+          ..Default::default()
         },
       ),
       (
         "fmt".to_string(),
         pruner::config::FormatterSpec {
           cmd: "base".to_string(),
-          args: Vec::new(),
-          stdin: None,
-          fail_on_stderr: None,
+          ..Default::default()
         },
       ),
     ])),
@@ -105,18 +101,14 @@ fn merges_configs_with_overlay_priority() {
         "fmt".to_string(),
         pruner::config::FormatterSpec {
           cmd: "overlay".to_string(),
-          args: Vec::new(),
-          stdin: None,
-          fail_on_stderr: None,
+          ..Default::default()
         },
       ),
       (
         "b".to_string(),
         pruner::config::FormatterSpec {
           cmd: "b".to_string(),
-          args: Vec::new(),
-          stdin: None,
-          fail_on_stderr: None,
+          ..Default::default()
         },
       ),
     ])),
@@ -154,6 +146,9 @@ fn merges_configs_with_overlay_priority() {
           cmd: "a".to_string(),
           args: Vec::new(),
           stdin: None,
+          stdout: None,
+          file_ext: None,
+          colocate_temp_file: None,
           fail_on_stderr: None,
         },
       ),
@@ -163,6 +158,9 @@ fn merges_configs_with_overlay_priority() {
           cmd: "overlay".to_string(),
           args: Vec::new(),
           stdin: None,
+          stdout: None,
+          file_ext: None,
+          colocate_temp_file: None,
           fail_on_stderr: None,
         },
       ),
@@ -172,6 +170,9 @@ fn merges_configs_with_overlay_priority() {
           cmd: "b".to_string(),
           args: Vec::new(),
           stdin: None,
+          stdout: None,
+          file_ext: None,
+          colocate_temp_file: None,
           fail_on_stderr: None,
         },
       ),
@@ -205,9 +206,7 @@ fn applies_profile_overrides() {
       "fmt".to_string(),
       pruner::config::FormatterSpec {
         cmd: "base_cmd".to_string(),
-        args: Vec::new(),
-        stdin: None,
-        fail_on_stderr: None,
+        ..Default::default()
       },
     )])),
     ..Default::default()
@@ -259,6 +258,9 @@ fn applies_profile_overrides() {
         cmd: "base_cmd".to_string(),
         args: Vec::new(),
         stdin: None,
+        stdout: None,
+        file_ext: None,
+        colocate_temp_file: None,
         fail_on_stderr: None,
       },
     )]),
@@ -367,4 +369,27 @@ rust = ["ts"]
     err.to_string().contains("Language alias 'ts' conflicts"),
     "Unexpected error: {err}"
   );
+}
+
+#[test]
+fn loads_formatter_colocate_temp_file_option() {
+  let temp_dir = unique_temp_dir();
+  let config_path = temp_dir.join("config.toml");
+
+  let mut file = File::create(&config_path).expect("should create config file");
+  writeln!(
+    file,
+    r#"
+[formatters]
+prettier = {{ cmd = "prettier", args = [], stdin = false, colocate_temp_file = true }}
+"#
+  )
+  .expect("should write config file");
+
+  let config = ConfigFile::from_file(&config_path).expect("should load config");
+  let formatters = config.formatters.expect("formatters should be set");
+  let prettier = formatters.get("prettier").expect("prettier should exist");
+
+  assert_eq!(prettier.stdin, Some(false));
+  assert_eq!(prettier.colocate_temp_file, Some(true));
 }

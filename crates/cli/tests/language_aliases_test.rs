@@ -23,6 +23,7 @@ fn normalizes_injected_language_via_aliases() -> Result<()> {
     &FormatOpts {
       printwidth: 80,
       language: "markdown",
+      source_file: None,
     },
     false,
     true,
