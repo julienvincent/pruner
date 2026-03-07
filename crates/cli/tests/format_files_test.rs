@@ -1,4 +1,5 @@
 use anyhow::Result;
+use rayon::prelude::*;
 use std::{
   collections::BTreeMap,
   fs,
@@ -7,7 +8,10 @@ use std::{
 };
 
 use pruner::{
-  api::format::{self, FormatContext, FormatOpts},
+  api::{
+    diff,
+    format::{self, FormatContext, FormatOpts},
+  },
   wasm::formatter::WasmFormatter,
 };
 
@@ -24,33 +28,90 @@ fn format_files() -> Result<()> {
   let input_dir = PathBuf::from("tests/fixtures/tests/format_files/input");
   let output_dir = PathBuf::from("tests/fixtures/tests/format_files/output");
   let temp_dir = create_temp_dir("pruner-format-files")?;
+  let opts = FormatOpts {
+    printwidth: 80,
+    language: "clojure",
+    source_file: None,
+  };
+  let format_context = FormatContext {
+    grammars: &grammars,
+    languages: &languages,
+    language_aliases: &language_aliases,
+    formatters: &formatters,
+    wasm_formatter: &wasm_formatter,
+  };
 
   copy_dir_recursive(&input_dir, &temp_dir)?;
 
-  format::format_files(
+  let changes = format::format_files(
     &temp_dir,
     "**/*.clj",
     None,
     true,
-    &FormatOpts {
-      printwidth: 80,
-      language: "clojure",
-      source_file: None,
-    },
+    &opts,
     false,
-    &FormatContext {
-      grammars: &grammars,
-      languages: &languages,
-      language_aliases: &language_aliases,
-      formatters: &formatters,
-      wasm_formatter: &wasm_formatter,
-    },
+    &format_context,
   )?;
+
+  for change in changes.collect::<Vec<_>>() {
+    change?;
+  }
 
   let actual_files = collect_files(&temp_dir)?;
   let expected_files = collect_files(&output_dir)?;
 
   assert_eq!(actual_files, expected_files);
+
+  let _ = fs::remove_dir_all(&temp_dir);
+  Ok(())
+}
+
+#[test]
+fn check_mode_returns_file_changes_for_dirty_files() -> Result<()> {
+  let grammars = common::grammars()?;
+  let formatters = common::formatters();
+  let languages = common::languages();
+  let language_aliases = common::language_aliases();
+  let wasm_formatter = WasmFormatter::new("cache".into())?;
+
+  let input_dir = PathBuf::from("tests/fixtures/tests/format_files/input");
+  let temp_dir = create_temp_dir("pruner-format-files-check")?;
+  let opts = FormatOpts {
+    printwidth: 80,
+    language: "clojure",
+    source_file: None,
+  };
+  let format_context = FormatContext {
+    grammars: &grammars,
+    languages: &languages,
+    language_aliases: &language_aliases,
+    formatters: &formatters,
+    wasm_formatter: &wasm_formatter,
+  };
+
+  copy_dir_recursive(&input_dir, &temp_dir)?;
+
+  let changes = format::format_files(
+    &temp_dir,
+    "**/*.clj",
+    None,
+    false,
+    &opts,
+    false,
+    &format_context,
+  )?;
+
+  let changes = changes
+    .collect::<Vec<_>>()
+    .into_iter()
+    .collect::<Result<Vec<_>>>()?;
+  assert!(!changes.is_empty());
+  for change in changes {
+    let diff = diff::unified_diff(&change.path, &change.original, &change.formatted);
+    assert!(diff.contains("--- a/"));
+    assert!(diff.contains("+++ b/"));
+    assert!(diff.contains("@@"));
+  }
 
   let _ = fs::remove_dir_all(&temp_dir);
   Ok(())

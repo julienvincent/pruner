@@ -1,4 +1,6 @@
 use anyhow::{Context, Result};
+use rayon::prelude::*;
+use std::sync::atomic::{AtomicUsize, Ordering};
 use std::{fs, io::Read, path::PathBuf, process::exit, time::Instant};
 
 use crate::{
@@ -109,28 +111,48 @@ fn format_stdin(args: &FormatArgs, context: &FormatContext) -> Result<()> {
 
 fn format_files(args: &FormatArgs, context: &FormatContext) -> Result<()> {
   let cwd = std::env::current_dir()?;
+  let opts = FormatOpts {
+    printwidth: args.print_width,
+    language: &args.lang,
+    source_file: None,
+  };
 
-  let paths = format::format_files(
+  let changes = format::format_files(
     &args.dir.clone().unwrap_or(cwd),
     &args.include_glob.clone().unwrap(),
     args.exclude.clone(),
     !args.check,
-    &FormatOpts {
-      printwidth: args.print_width,
-      language: &args.lang,
-      source_file: None,
-    },
+    &opts,
     args.skip_root,
     context,
   )?;
 
+  let dirty_count = AtomicUsize::new(0);
+  let check = args.check;
+  changes.try_for_each(|change| -> Result<()> {
+    let change = change?;
+    dirty_count.fetch_add(1, Ordering::Relaxed);
+
+    if check {
+      let diff = api::diff::unified_diff(&change.path, &change.original, &change.formatted);
+      api::diff::print_colored_diff_to_stderr(&diff)?;
+    } else {
+      log::info!("{}", change.path);
+    }
+
+    Ok(())
+  })?;
+
+  let dirty_count = dirty_count.load(Ordering::Relaxed);
+
+  let pluralised = if dirty_count == 1 { "" } else { "s" };
   if args.check {
-    if !paths.is_empty() {
-      log::error!("{} dirty files", paths.len());
+    if dirty_count > 0 {
+      log::error!("{} dirty file{pluralised}", dirty_count);
       exit(1);
     }
   } else {
-    log::info!("formatted {} files", paths.len());
+    log::info!("formatted {} file{pluralised}", dirty_count);
   }
 
   Ok(())

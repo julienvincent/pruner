@@ -20,6 +20,13 @@ pub struct FormatContext<'a> {
   pub wasm_formatter: &'a WasmFormatter,
 }
 
+#[derive(Debug, Clone)]
+pub struct FormatFileChange {
+  pub path: String,
+  pub original: Vec<u8>,
+  pub formatted: Vec<u8>,
+}
+
 pub fn format(
   source: &[u8],
   opts: &FormatOpts,
@@ -150,7 +157,7 @@ pub fn format_file(
   opts: &FormatOpts,
   skip_root: bool,
   format_context: &FormatContext,
-) -> Result<bool> {
+) -> Result<Option<(Vec<u8>, Vec<u8>)>> {
   let content = fs::read(file).context("Failed to read temp file after formatting")?;
 
   let result = format(
@@ -167,27 +174,27 @@ pub fn format_file(
   .context("Failed to format file contents")?;
 
   if result == content {
-    return Ok(false);
+    return Ok(None);
   }
 
   if write {
     fs::write(file, &result).context("Failed to write formatted contents to file")?;
   }
 
-  Ok(true)
+  Ok(Some((content, result)))
 }
 
-pub fn format_files(
+pub fn format_files<'a>(
   dir: &Path,
   include_glob: &str,
   exclude_globs: Option<Vec<String>>,
 
   write: bool,
 
-  opts: &FormatOpts,
+  opts: &'a FormatOpts,
   skip_root: bool,
-  format_context: &FormatContext,
-) -> Result<Vec<String>> {
+  format_context: &'a FormatContext,
+) -> Result<impl rayon::iter::ParallelIterator<Item = Result<FormatFileChange>> + 'a> {
   let include_matcher = globset::Glob::new(include_glob)?.compile_matcher();
 
   let mut exclude_glob_builder = globset::GlobSetBuilder::new();
@@ -198,29 +205,29 @@ pub fn format_files(
   let exclude_matcher = exclude_glob_builder.build()?;
 
   let walker = ignore::WalkBuilder::new(dir).current_dir(dir).build();
-  walker
+  Ok(walker
     .filter_map(|entry| entry.ok())
     .filter(|entry| !entry.path().is_dir())
-    .filter(|entry| {
+    .filter(move |entry| {
       include_matcher.is_match(entry.path()) && !exclude_matcher.is_match(entry.path())
     })
     .par_bridge()
-    .filter_map(
-      |entry| match format_file(entry.path(), write, opts, skip_root, format_context) {
+    .filter_map(move |entry| {
+      let path = entry.path().to_path_buf();
+      match format_file(&path, write, opts, skip_root, format_context) {
         Err(err) => {
-          log::error!(
-            "Failed to format file {}: {err}",
-            entry.path().to_string_lossy()
-          );
-          Some(Err(err))
+          let path_str = path.to_string_lossy();
+          Some(Err(err).context(format!("Failed to format file {path_str}")))
         }
-        Ok(true) => {
-          let path = entry.path().to_string_lossy();
-          log::info!("{path}");
-          Some(Ok(String::from(path)))
+        Ok(Some((original, formatted))) => {
+          let path = path.to_string_lossy();
+          Some(Ok(FormatFileChange {
+            path: String::from(path),
+            original,
+            formatted,
+          }))
         }
-        Ok(false) => None,
-      },
-    )
-    .collect::<Result<Vec<String>>>()
+        Ok(None) => None,
+      }
+    }))
 }

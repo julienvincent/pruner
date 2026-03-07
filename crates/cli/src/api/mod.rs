@@ -1,3 +1,4 @@
+pub mod diff;
 pub mod directives;
 pub mod format;
 pub mod git;
