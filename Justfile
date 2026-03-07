@@ -4,11 +4,11 @@ default:
 prepare:
     cd crates/cli && just prepare
 
-build:
-    cargo build -p pruner --release
+build profile='release':
+    cargo build -p pruner --profile={{ profile }}
 
-install: build
-    cp target/release/pruner ~/.local/bin/pruner
+install profile='release': (build profile)
+    cp target/{{ if profile == "dev" { "debug" } else { profile } }}/pruner ~/.local/bin/pruner
 
-test test = "":
+test test="":
     cargo test {{ test }} -- --nocapture
