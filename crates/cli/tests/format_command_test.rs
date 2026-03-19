@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use anyhow::Result;
 
 use pruner::{
@@ -488,6 +490,39 @@ fn nix_templated_embeddings_test() -> Result<()> {
   .unwrap();
 
   let expected = common::load_file("nix_templated_embeddings/output.nix");
+
+  assert_eq!(String::from_utf8(result).unwrap(), expected);
+
+  Ok(())
+}
+
+#[test]
+fn indented_markdown_blank_config_test() -> Result<()> {
+  let grammars = common::grammars()?;
+  let wasm_formatter = WasmFormatter::new("cache".into())?;
+
+  let source = common::load_file("indented_markdown/input.md");
+
+  let result = format::format(
+    source.as_bytes(),
+    &FormatOpts {
+      printwidth: 80,
+      language: "markdown",
+      source_file: None,
+    },
+    true,
+    true,
+    &FormatContext {
+      grammars: &grammars,
+      languages: &HashMap::new(),
+      language_aliases: &HashMap::new(),
+      formatters: &HashMap::new(),
+      wasm_formatter: &wasm_formatter,
+    },
+  )
+  .unwrap();
+
+  let expected = common::load_file("indented_markdown/output.md");
 
   assert_eq!(String::from_utf8(result).unwrap(), expected);
 

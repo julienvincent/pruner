@@ -97,7 +97,11 @@ pub fn format(
       }
 
       let unescaped_source = normalized_source.into_bytes();
-      let trailing_newlines = text::trailing_newlines(source_slice);
+      let trailing_newlines = if !indent_from_content && indent > 0 {
+        text::trailing_newlines_with_indent(source_slice, indent)
+      } else {
+        text::trailing_newlines(source_slice)
+      };
       let adjusted_printwidth = opts.printwidth.saturating_sub(indent as u32);
       let mut formatted_sub_result = format(
         &unescaped_source,
@@ -130,6 +134,12 @@ pub fn format(
         }
       }
       text::offset_lines(&mut formatted_sub_result, indent);
+
+      if !indent_from_content && indent > 0 && formatted_sub_result.last() == Some(&b'\n') {
+        let spaces = vec![b' '; indent];
+        formatted_sub_result.extend_from_slice(&spaces);
+      }
+
       Ok((region.clone(), formatted_sub_result))
     })
     .collect::<Vec<Result<(api::injections::InjectedRegion, Vec<u8>)>>>();

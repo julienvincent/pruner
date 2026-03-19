@@ -40,6 +40,16 @@ pub fn trailing_newlines(data: &[u8]) -> Vec<u8> {
   data[index..].to_vec()
 }
 
+pub fn trailing_newlines_with_indent(data: &[u8], indent: usize) -> Vec<u8> {
+  if data.len() >= indent {
+    let tail = &data[data.len() - indent..];
+    if tail.iter().all(|&b| b == b' ') {
+      return trailing_newlines(&data[..data.len() - indent]);
+    }
+  }
+  trailing_newlines(data)
+}
+
 pub fn column_for_byte(source: &[u8], byte_index: usize) -> usize {
   let target = byte_index.min(source.len());
   let line_start = source[..target]
